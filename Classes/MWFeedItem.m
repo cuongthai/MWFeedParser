@@ -83,6 +83,17 @@
         return nil;
     }
     
+    return [self imagesInString:self.content];
+}
+
+- (NSArray *)imagesInDescription {
+    if (!self.summary){
+        return nil;
+    }
+    return [self imagesInString:self.summary];
+}
+
+- (NSArray *) imagesInString:(NSString *)string {
     NSMutableArray *results = [NSMutableArray new];
     NSString* pattern = @"(<img.*?src=\\\")(.*?)(\\\".*?>)";
     
@@ -90,9 +101,9 @@
     NSRegularExpression* regex = [NSRegularExpression regularExpressionWithPattern:pattern options:NSRegularExpressionCaseInsensitive error:&error];
     
     if (error == nil){
-        NSArray *matches = [regex matchesInString:self.content options:0 range:NSMakeRange(0, self.content.length)];
+        NSArray *matches = [regex matchesInString:string options:0 range:NSMakeRange(0, string.length)];
         for (NSTextCheckingResult *match in matches){
-            [results addObject:[self.content substringWithRange:[match rangeAtIndex:2]]];
+            [results addObject:[string substringWithRange:[match rangeAtIndex:2]]];
         }
     }
     return results;
