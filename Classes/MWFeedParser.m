@@ -606,6 +606,8 @@
                         else if ([currentPath isEqualToString:@"/rss/channel/item/media:thumbnail"]) {if ([self.currentElementAttributes objectForKey:@"url"])
                             item.imageURL = self.currentElementAttributes[@"url"];
                             processed = YES; }
+                        else if ([currentPath isEqualToString:@"/rss/channel/item/category"]) { [self appendCategory:processedText toItem:self.item];
+                            processed = YES; }
                     }
                     
                     // Info
@@ -633,6 +635,8 @@
                         else if ([currentPath isEqualToString:@"/rdf:RDF/item/dc:creator"]) { if (processedText.length > 0) item.author = processedText; processed = YES; }
                         else if ([currentPath isEqualToString:@"/rdf:RDF/item/dc:date"]) { if (processedText.length > 0) item.date = [NSDate dateFromInternetDateTimeString:processedText formatHint:DateFormatHintRFC3339]; processed = YES; }
                         else if ([currentPath isEqualToString:@"/rdf:RDF/item/enc:enclosure"]) { [self createEnclosureFromAttributes:currentElementAttributes andAddToItem:item]; processed = YES; }
+                        else if ([currentPath isEqualToString:@"/rdf:RDF/channel/dc:category"]) { [self appendCategory:processedText toItem:self.item];
+                            processed = YES; }
                     }
                     
                     // Info
@@ -661,6 +665,11 @@
                         else if ([currentPath isEqualToString:@"/feed/entry/dc:creator"]) { if (processedText.length > 0) item.author = processedText; processed = YES; }
                         else if ([currentPath isEqualToString:@"/feed/entry/published"]) { if (processedText.length > 0) item.date = [NSDate dateFromInternetDateTimeString:processedText formatHint:DateFormatHintRFC3339]; processed = YES; }
                         else if ([currentPath isEqualToString:@"/feed/entry/updated"]) { if (processedText.length > 0) item.updated = [NSDate dateFromInternetDateTimeString:processedText formatHint:DateFormatHintRFC3339]; processed = YES; }
+                        else if ([currentPath isEqualToString:@"/feed/entry/category"]) {
+                            if (self.currentElementAttributes[@"term"]) {
+                                [self appendCategory:processedText toItem:self.item];
+                            }
+                        }
                     }
                     
                     // Info
@@ -924,6 +933,14 @@
 		return NO;
 	}
 	
+}
+
+- (void)appendCategory:(NSString *)processedText toItem:(MWFeedItem *)currentItem{
+    if (currentItem.categories) {
+        [currentItem.categories arrayByAddingObject:processedText];
+    }else{
+        currentItem.categories = [NSArray arrayWithObject:processedText];
+    }
 }
 
 // Process ATOM link and determine whether to ignore it, add it as the link element or add as enclosure
