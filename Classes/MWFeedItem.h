@@ -60,5 +60,5 @@
 @property (nonatomic, copy) NSString *author;
 @property (nonatomic, copy) NSArray *enclosures;
 @property (nonatomic, copy) NSString *imageURL;
-
+@property (nonatomic, copy, readonly) NSArray *imagesInContent;
 @end
